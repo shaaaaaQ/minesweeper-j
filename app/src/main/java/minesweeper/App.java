@@ -9,6 +9,7 @@ import com.raylib.java.shapes.rShapes;
 
 public class App {
     static Raylib rlj = new Raylib();
+
     public static void main(String[] args) {
         int padding = 20;
         int cellSize = 50;
@@ -32,12 +33,14 @@ public class App {
             for (int y = 0; y < game.board.getHeight(); y++) {
                 for (int x = 0; x < game.board.getWidth(); x++) {
                     Cell cell = game.board.getCell(x, y);
-                    Rectangle cellRec = new Rectangle(padding + x * cellSize, padding + y * cellSize, cellSize, cellSize);
+                    Rectangle cellRec = new Rectangle(padding + x * cellSize, padding + y * cellSize, cellSize,
+                            cellSize);
 
                     Color cellColor;
                     if (cell.isOpen)
                         cellColor = Color.GRAY;
-                    else if ((game.state == GameState.Play) && rlj.shapes.CheckCollisionPointRec(rCore.GetMousePosition(), cellRec))
+                    else if ((game.isPlay())
+                            && rlj.shapes.CheckCollisionPointRec(rCore.GetMousePosition(), cellRec))
                         // プレイ中 & ホバー中
                         cellColor = Color.SKYBLUE;
                     else if (((x + y) % 2) == 0)
@@ -50,16 +53,14 @@ public class App {
                     if (cell.isOpen) {
                         if (cell.isMine) {
                             drawTextCenter("B", cellRec, fontSize, Color.DARKBROWN);
-                        }
-                        else if (!(cell.vicinityMineNum == 0)){
+                        } else if (!(cell.vicinityMineNum == 0)) {
                             drawTextCenter(String.valueOf(cell.vicinityMineNum), cellRec, fontSize, Color.BLACK);
                         }
-                    }
-                    else if (cell.isFlag) {
+                    } else if (cell.isFlag) {
                         drawTextCenter("F", cellRec, fontSize, Color.RED);
                     }
 
-                    if (game.state == GameState.Play) {
+                    if (game.isPlay()) {
                         if (rlj.shapes.CheckCollisionPointRec(rCore.GetMousePosition(), cellRec)) {
                             if (rlj.core.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
                                 game.open(x, y);
@@ -73,10 +74,10 @@ public class App {
                 }
             }
 
-            if ((game.state == GameState.Win) || (game.state == GameState.Lose)) {
+            if (game.isWin() || game.isLose()) {
                 Rectangle screenRec = new Rectangle(0, 0, screenWidth, screenHeight);
                 rShapes.DrawRectangleRec(screenRec, new Color(255, 255, 255, 200));
-                String labelText = game.state == GameState.Win ? "Game Clear" : "Game Over";
+                String labelText = game.isWin() ? "Game Clear" : "Game Over";
                 int labelFontSize = 60;
                 int labelTextWidth = rlj.text.MeasureText(labelText, labelFontSize);
                 int posX = ((screenWidth / 2) - (labelTextWidth / 2));
@@ -93,19 +94,23 @@ public class App {
                 Color buttonColor = isHover ? new Color(190, 198, 213, 255) : new Color(156, 163, 175, 255);
                 rShapes.DrawRectangleRec(buttonRec, buttonColor);
                 drawTextCenter(buttonText, buttonRec, buttonFontSize, Color.BLACK);
-                if (isHover && rlj.core.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)) game = new Game(col, row, mine);
+                if (isHover && rlj.core.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT))
+                    game = new Game(col, row, mine);
             }
 
             rlj.core.EndDrawing();
         }
     }
+
     private static void drawTextCenter(String text, Rectangle rec, int fontSize, Color color) {
         int textWidth = rlj.text.MeasureText(text, fontSize);
         int posX = (int) (rec.x + (rec.width / 2) - (textWidth / 2));
         int posY = (int) (rec.y + (rec.height / 2) - (fontSize / 2));
         rlj.text.DrawText(text, posX, posY, fontSize, color);
     }
-    private static Rectangle rectFromAnchor(Rectangle parentRec, Anchor anchor, float offsetX, float offsetY, float width, float height) {
+
+    private static Rectangle rectFromAnchor(Rectangle parentRec, Anchor anchor, float offsetX, float offsetY,
+            float width, float height) {
         float x = 0, y = 0;
 
         switch (anchor) {

@@ -34,7 +34,8 @@ public class Board {
         ArrayList<Cell> result = new ArrayList<>();
         for (int r = y - 1; r <= y + 1; r++) {
             for (int c = x - 1; c <= x + 1; c++) {
-                if ((r < 0) || (r >= height) || (c < 0) || (c >= width) || ((r == y) && (c == x))) continue;
+                if ((r < 0) || (r >= height) || (c < 0) || (c >= width) || ((r == y) && (c == x)))
+                    continue;
                 result.add(getCell(c, r));
             }
         }
