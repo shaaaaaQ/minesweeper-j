@@ -102,4 +102,8 @@ public class Game {
             count++;
         }
     }
+
+    public int getMineLeft() {
+        return mineNum - flagNum;
+    }
 }

@@ -10,18 +10,23 @@ import com.raylib.java.shapes.rShapes;
 public class App {
     static Raylib rlj = new Raylib();
 
+    static int padding = 20;
+    static int cellSize = 50;
+    static int fontSize = 35;
+    static int headerHeight = 50;
+    static int headerMarginBottom = 12;
+
+    static int col = 9;
+    static int row = 7;
+    static int mine = 10;
+
+    static Game game = new Game(col, row, mine);
+
     public static void main(String[] args) {
-        int padding = 20;
-        int cellSize = 50;
-        int fontSize = 35;
-
-        int col = 9;
-        int row = 7;
-        int mine = 10;
-
-        rlj.core.InitWindow(padding * 2 + col * cellSize, padding * 2 + row * cellSize, "Minesweeper Raylib-J");
-
-        Game game = new Game(col, row, mine);
+        int windowWidth = padding * 2 + col * cellSize;
+        int windowHeight = padding * 2 + row * cellSize + headerHeight + headerMarginBottom;
+        String windowTitle = "Minesweeper Raylib-J";
+        rlj.core.InitWindow(windowWidth, windowHeight, windowTitle);
 
         while (!rlj.core.WindowShouldClose()) {
             int screenWidth = rCore.GetScreenWidth();
@@ -33,7 +38,9 @@ public class App {
             for (int y = 0; y < game.board.getHeight(); y++) {
                 for (int x = 0; x < game.board.getWidth(); x++) {
                     Cell cell = game.board.getCell(x, y);
-                    Rectangle cellRec = new Rectangle(padding + x * cellSize, padding + y * cellSize, cellSize,
+                    Rectangle cellRec = new Rectangle(padding + x * cellSize,
+                            padding + headerMarginBottom + headerHeight + y * cellSize,
+                            cellSize,
                             cellSize);
 
                     Color cellColor;
@@ -71,6 +78,26 @@ public class App {
                             }
                         }
                     }
+                }
+            }
+
+            Rectangle headerRect = new Rectangle(padding, padding, cellSize * game.board.getWidth(), headerHeight);
+            {
+                Rectangle mineLeftRect = rectFromAnchor(headerRect, Anchor.TopLeft, 0, 0, 100, headerRect.height);
+                rShapes.DrawRectangleRec(mineLeftRect, Color.DARKBLUE);
+                String mineLeft = String.valueOf(game.getMineLeft());
+
+                {
+                    int posX = (int) (mineLeftRect.x + 8);
+                    int posY = (int) (mineLeftRect.y + (mineLeftRect.height / 2) - (fontSize / 2));
+                    rlj.text.DrawText("F", posX, posY, fontSize, Color.RED);
+                }
+
+                {
+                    int mineLeftWidth = rlj.text.MeasureText(mineLeft, fontSize);
+                    int posX = (int) (mineLeftRect.x + mineLeftRect.width - mineLeftWidth - 8);
+                    int posY = (int) (mineLeftRect.y + (mineLeftRect.height / 2) - (fontSize / 2));
+                    rlj.text.DrawText(mineLeft, posX, posY, fontSize, Color.WHITE);
                 }
             }
 
